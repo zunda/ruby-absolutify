@@ -12,7 +12,7 @@
 require 'uri'
 
 def absolutify(html, baseurl)
-	baseuri = URI.parse(baseurl)
+	baseuri = URI.parse(URI.encode(baseurl))
 	r = html.gsub(%r|<\S[^>]*/?>|) do |tag|
 		type = tag.scan(/\A<(\S+)/)[0][0].downcase
 		if attr = {'a' => 'href', 'img' => 'src'}[type]
@@ -40,6 +40,13 @@ if __FILE__ == $0
 	require 'test/unit'
 
 	class TestAbsolutify < Test::Unit::TestCase
+		def test_encode
+			assert_equal(
+				'<img src="http://example.org/f%22oo/bar/baz.png">',
+				absolutify('<img src="bar/baz.png">', 'http://example.org/f"oo/')
+			)
+		end
+
 		def test_with_query_and_fragment
 			assert_equal(
 				'<img src="http://example.org/foo/bar/baz.png?muga#here">',

@@ -1,5 +1,5 @@
 #!/usr/bin/ruby
-# vim:set fleencoding=utf-8:
+# vim:set fileencoding=utf-8:
 #
 # absolutify.rb - a method to modify relative URIs into absolute ones
 #

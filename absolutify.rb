@@ -52,6 +52,28 @@ if __FILE__ == $0
 			)
 		end
 
+		def test_simple_a
+			assert_equal(
+				'<a href="http://example.org/foo/bar/baz.png">',
+				absolutify('<a href="bar/baz.png">', 'http://example.org/foo/')
+			)
+			assert_equal(
+				"<a href='http://example.org/foo/bar/baz.png'>",
+				absolutify("<a href='bar/baz.png'>", 'http://example.org/foo/')
+			)
+			assert_equal(
+				'<a href=http://example.org/foo/bar/baz.png>',
+				absolutify('<a href=bar/baz.png>', 'http://example.org/foo/')
+			)
+		end
+
+		def test_not_url
+			assert_equal(
+				'<img src="this is not a valid path">',
+				absolutify('<img src="this is not a valid path">', 'http://example.org/foo/')
+			)
+		end
+
 		def not_yet_test_real_data
 			srcs = Array.new
 			srcs[0] = <<_END

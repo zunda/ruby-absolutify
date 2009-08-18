@@ -1,8 +1,36 @@
 #!/usr/bin/ruby
 # vim:set fleencoding=utf-8:
+#
+# absolutify.rb - a method to modify relative URIs into absolute ones
+#
+# Copyright 2009 zunda <zunda at freeshell.org>
+# 
+# Permission is granted for use, copying, modification, distribution,
+# and distribution of modified versions of this work under the terms
+# of GPL version 2 or later.
+#
+require 'uri'
 
 def absolutify(html, baseurl)
-	return html
+	r = html.gsub(%r|<\S[^>]*/?>|) do |tag|
+		type = tag.scan(/\A<(\S+)/)[0][0]
+		if attr = {'a' => 'href', 'img' => 'src'}[type]
+			m = tag.match(%r|(.*#{attr}=)(['"]?)([^\2>]+)\2(.*)|)
+			prefix = m[1] + m[2]
+			location = m[3]
+			postfix = m[2] + m[4]
+			begin
+				uri = URI.parse(location)
+				if uri.relative?
+					location = baseurl + location
+					tag = prefix + location + postfix
+				end
+			rescue URI::InvalidURIError
+			end
+		end
+		tag
+	end
+	return r
 end
 
 if __FILE__ == $0
@@ -12,15 +40,15 @@ if __FILE__ == $0
 		def test_simple_img
 			assert_equal(
 				'<img src="http://example.org/foo/bar/baz.png">',
-				absolutify('<img src="../foo/bar/baz.png">', 'http://example.org/hoge/')
+				absolutify('<img src="bar/baz.png">', 'http://example.org/foo/')
 			)
 			assert_equal(
 				"<img src='http://example.org/foo/bar/baz.png'>",
-				absolutify("<img src='../foo/bar/baz.png'>", 'http://example.org/hoge/')
+				absolutify("<img src='bar/baz.png'>", 'http://example.org/foo/')
 			)
 			assert_equal(
 				'<img src=http://example.org/foo/bar/baz.png>',
-				absolutify('<img src=../foo/bar/baz.png>', 'http://example.org/hoge/')
+				absolutify('<img src=bar/baz.png>', 'http://example.org/foo/')
 			)
 		end
 

@@ -40,6 +40,13 @@ if __FILE__ == $0
 	require 'test/unit'
 
 	class TestAbsolutify < Test::Unit::TestCase
+		def test_with_query_and_fragment
+			assert_equal(
+				'<img src="http://example.org/foo/bar/baz.png?muga#here">',
+				absolutify('<img src="bar/baz.png?muga#here">', 'http://example.org/foo/')
+			)
+		end
+
 		def test_partially_absolute
 			assert_equal(
 				'<img src="http://example.org/foo/bar/baz.png">',

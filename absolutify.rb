@@ -13,9 +13,9 @@ require 'uri'
 
 def absolutify(html, baseurl)
 	r = html.gsub(%r|<\S[^>]*/?>|) do |tag|
-		type = tag.scan(/\A<(\S+)/)[0][0]
+		type = tag.scan(/\A<(\S+)/)[0][0].downcase
 		if attr = {'a' => 'href', 'img' => 'src'}[type]
-			m = tag.match(%r|(.*#{attr}=)(['"]?)([^\2>]+)\2(.*)|)
+			m = tag.match(%r|(.*#{attr}=)(['"]?)([^\2>]+)\2(.*)|i)
 			prefix = m[1] + m[2]
 			location = m[3]
 			postfix = m[2] + m[4]
@@ -37,6 +37,13 @@ if __FILE__ == $0
 	require 'test/unit'
 
 	class TestAbsolutify < Test::Unit::TestCase
+		def test_capitalized
+			assert_equal(
+				'<IMG SRC="http://example.org/foo/bar/baz.png">',
+				absolutify('<IMG SRC="bar/baz.png">', 'http://example.org/foo/')
+			)
+		end
+
 		def test_simple_img
 			assert_equal(
 				'<img src="http://example.org/foo/bar/baz.png">',

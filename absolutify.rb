@@ -21,8 +21,7 @@ def absolutify(html, baseurl)
 			location = m[3]
 			postfix = m[2] + m[4]
 			begin
-				uri = URI.parse(location)
-				if uri.relative?
+				if URI.parse(location).relative?
 					tag = prefix + (baseuri + location).to_s + postfix
 				end
 			rescue URI::InvalidURIError

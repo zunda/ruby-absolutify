@@ -21,9 +21,13 @@ def absolutify(html, baseurl)
 			location = m[3]
 			postfix = m[2] + m[4]
 			begin
-				if URI.parse(location).relative?
-					tag = prefix + (baseuri + location).to_s + postfix
+				uri = URI.parse(location)
+				if uri.relative?
+					abs_location = (baseuri + location).to_s
+				elsif not uri.host
+					abs_location = (baseuri + uri.path).to_s
 				end
+				tag = prefix + abs_location + postfix
 			rescue URI::InvalidURIError
 			end
 		end
@@ -36,6 +40,13 @@ if __FILE__ == $0
 	require 'test/unit'
 
 	class TestAbsolutify < Test::Unit::TestCase
+		def test_partially_absolute
+			assert_equal(
+				'<img src="http://example.org/foo/bar/baz.png">',
+				absolutify('<img src="http:/foo/bar/baz.png">', 'http://example.org/foo/')
+			)
+		end
+
 		def test_attributes
 			assert_equal(
 				'<img class="photo" src="http://example.org/foo/bar/baz.png" alt="baz">',

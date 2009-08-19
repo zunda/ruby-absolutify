@@ -25,7 +25,10 @@ def absolutify(html, baseurl)
 				if uri.relative?
 					location = (baseuri + location).to_s
 				elsif not uri.host
-					location = (baseuri + uri.path).to_s
+					path = uri.path
+					path += '?' + uri.query if uri.query
+					path += '#' + uri.fragment if uri.fragment
+					location = (baseuri + path).to_s
 				end
 				tag = prefix + location + postfix
 			rescue URI::InvalidURIError
@@ -44,6 +47,21 @@ if __FILE__ == $0
 			assert_equal(
 				'<img src="http://example.org/f%22oo/bar/baz.png">',
 				absolutify('<img src="bar/baz.png">', 'http://example.org/f"oo/')
+			)
+		end
+
+		def test_with_host_query_and_fragment
+			assert_equal(
+				'<img src="http://example.org/bar/baz.png?muga#here">',
+				absolutify('<img src="http:/bar/baz.png?muga#here">', 'http://example.org/foo/')
+			)
+			assert_equal(
+				'<img src="http://example.org/bar/baz.png?muga">',
+				absolutify('<img src="http:/bar/baz.png?muga">', 'http://example.org/foo/')
+			)
+			assert_equal(
+				'<img src="http://example.org/bar/baz.png#here">',
+				absolutify('<img src="http:/bar/baz.png#here">', 'http://example.org/foo/')
 			)
 		end
 

@@ -12,11 +12,13 @@
 require 'uri'
 
 def absolutify(html, baseurl)
+	@@_absolutify_attr_regexp ||= Hash.new
 	baseuri = URI.parse(URI.encode(baseurl))
 	r = html.gsub(%r|<\S[^>]*/?>|) do |tag|
 		type = tag.scan(/\A<(\S+)/)[0][0].downcase
 		if attr = {'a' => 'href', 'img' => 'src'}[type]
-			m = tag.match(%r|(.*#{attr}=)(['"]?)([^\2>]+?)\2(.*)|im)
+			@@_absolutify_attr_regexp[attr] ||= %r|(.*#{attr}=)(['"]?)([^\2>]+?)\2(.*)|im
+			m = tag.match(@@_absolutify_attr_regexp[attr])
 			prefix = m[1] + m[2]
 			location = m[3]
 			postfix = m[2] + m[4]

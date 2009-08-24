@@ -16,7 +16,7 @@ def absolutify(html, baseurl)
 	r = html.gsub(%r|<\S[^>]*/?>|) do |tag|
 		type = tag.scan(/\A<(\S+)/)[0][0].downcase
 		if attr = {'a' => 'href', 'img' => 'src'}[type]
-			m = tag.match(%r|(.*#{attr}=)(['"]?)([^\2>]+?)\2(.*)|i)
+			m = tag.match(%r|(.*#{attr}=)(['"]?)([^\2>]+?)\2(.*)|im)
 			prefix = m[1] + m[2]
 			location = m[3]
 			postfix = m[2] + m[4]
@@ -127,6 +127,17 @@ if __FILE__ == $0
 			assert_equal(
 				'<a href=http://example.org/foo/bar/baz.png>',
 				absolutify('<a href=bar/baz.png>', 'http://example.org/foo/')
+			)
+		end
+
+		def test_new_line_inside_tag
+			assert_equal(
+				'<a href="http://www.example.com/foo/"><img class="left"
+src="http://www.example.com/foo.png"></a>
+',
+				absolutify('<a href="http://www.example.com/foo/"><img class="left"
+src="http://www.example.com/foo.png"></a>
+', 'http://example.org/foo/')
 			)
 		end
 

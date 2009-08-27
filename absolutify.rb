@@ -117,6 +117,13 @@ if __FILE__ == $0
 			)
 		end
 
+		def test_img_with_other_tags
+			assert_equal(
+				'<p><img class="right" src="http://example.org/foo/bar/baz.png">hello world</p>',
+				absolutify('<p><img class="right" src="bar/baz.png">hello world</p>', 'http://example.org/foo/')
+			)
+		end
+
 		def test_simple_a
 			assert_equal(
 				'<a href="http://example.org/foo/bar/baz.png">',

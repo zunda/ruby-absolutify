@@ -152,7 +152,7 @@ src="http://www.example.com/foo.png"></a>
 			)
 		end
 
-		def test_white_space_arrount_equal_sign
+		def test_white_space_arround_equal_sign
 			assert_equal(
 				'<img class = "left" src = "http://www.example.com/foo.png"></a>',
 				absolutify('<img class = "left" src = "http://www.example.com/foo.png"></a>', 'http://example.org/foo/')
@@ -163,7 +163,7 @@ src="http://www.example.com/foo.png"></a>
 			)
 		end
 
-		def test_without_replacing_attributes
+		def test_without_attributes_to_be_replaced
 			assert_equal(
 				'<a name="2009/07/19">foo</a>',
 				absolutify('<a name="2009/07/19">foo</a>', 'http://example.org/foo/')

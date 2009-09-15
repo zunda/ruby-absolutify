@@ -17,23 +17,25 @@ def absolutify(html, baseurl)
 	r = html.gsub(%r|<\S[^>]*/?>|) do |tag|
 		type = tag.scan(/\A<(\S+)/)[0][0].downcase
 		if attr = {'a' => 'href', 'img' => 'src'}[type]
-			@@_absolutify_attr_regexp[attr] ||= %r|(.*#{attr}=)(['"]?)([^\2>]+?)\2(.*)|im
+			@@_absolutify_attr_regexp[attr] ||= %r|(.*#{attr}\s*=\s*)(['"]?)([^\2>]+?)(\2.*)|im
 			m = tag.match(@@_absolutify_attr_regexp[attr])
-			prefix = m[1] + m[2]
-			location = m[3]
-			postfix = m[2] + m[4]
-			begin
-				uri = URI.parse(location)
-				if uri.relative?
-					location = (baseuri + location).to_s
-				elsif not uri.host
-					path = uri.path
-					path += '?' + uri.query if uri.query
-					path += '#' + uri.fragment if uri.fragment
-					location = (baseuri + path).to_s
+			unless m.nil?
+				prefix = m[1] + m[2]
+				location = m[3]
+				postfix = m[4]
+				begin
+					uri = URI.parse(location)
+					if uri.relative?
+						location = (baseuri + location).to_s
+					elsif not uri.host
+						path = uri.path
+						path += '?' + uri.query if uri.query
+						path += '#' + uri.fragment if uri.fragment
+						location = (baseuri + path).to_s
+					end
+					tag = prefix + location + postfix
+				rescue URI::InvalidURIError
 				end
-				tag = prefix + location + postfix
-			rescue URI::InvalidURIError
 			end
 		end
 		tag
@@ -147,6 +149,20 @@ src="http://www.example.com/foo.png"></a>
 				absolutify('<a href="http://www.example.com/foo/"><img class="left"
 src="http://www.example.com/foo.png"></a>
 ', 'http://example.org/foo/')
+			)
+		end
+
+		def test_white_space_arrount_equal_sign
+			assert_equal(
+				'<img class = "left" src = "http://www.example.com/foo.png"></a>',
+				absolutify('<img class = "left" src = "http://www.example.com/foo.png"></a>', 'http://example.org/foo/')
+			)
+		end
+
+		def test_without_replacing_attributes
+			assert_equal(
+				'<a name="2009/07/19">foo</a>',
+				absolutify('<a name="2009/07/19">foo</a>', 'http://example.org/foo/')
 			)
 		end
 

@@ -157,6 +157,10 @@ src="http://www.example.com/foo.png"></a>
 				'<img class = "left" src = "http://www.example.com/foo.png"></a>',
 				absolutify('<img class = "left" src = "http://www.example.com/foo.png"></a>', 'http://example.org/foo/')
 			)
+			assert_equal(
+				'<img class = "left" src = "http://example.org/foo/bar.png"></a>',
+				absolutify('<img class = "left" src = "bar.png"></a>', 'http://example.org/foo/')
+			)
 		end
 
 		def test_without_replacing_attributes

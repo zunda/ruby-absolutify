@@ -152,7 +152,7 @@ src="http://www.example.com/foo.png"></a>
 			)
 		end
 
-		def test_white_space_arround_equal_sign
+		def test_white_space_around_equal_sign
 			assert_equal(
 				'<img class = "left" src = "http://www.example.com/foo.png"></a>',
 				absolutify('<img class = "left" src = "http://www.example.com/foo.png"></a>', 'http://example.org/foo/')

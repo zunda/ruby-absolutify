@@ -35,6 +35,7 @@ def absolutify(html, baseurl)
 					end
 					tag = prefix + location + postfix
 				rescue URI::InvalidURIError
+				rescue ArgumentError
 				end
 			end
 		end
@@ -174,6 +175,14 @@ src="http://www.example.com/foo.png"></a>
 			assert_equal(
 				'<img src="this is not a valid path">',
 				absolutify('<img src="this is not a valid path">', 'http://example.org/foo/')
+			)
+		end
+
+		# https://github.com/tdiary/tdiary-core/pull/213
+		def test_invalid_url
+			assert_equal(
+				'fuga<a href="foo:bar://baz">hoge</a>moga',
+				absolutify('fuga<a href="foo:bar://baz">hoge</a>moga', 'http://example.org/foo/')
 			)
 		end
 
